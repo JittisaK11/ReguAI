@@ -1,27 +1,33 @@
-import { useRef } from "react";
+import { useState } from 'react';
 
-const ChatForm = ({setChatHistory}) => {
-    const inputRef = useRef();
+export default function ChatForm({ setChatHistory }) {
+  const [input, setInput] = useState('');
 
-    const handleFormSubmit = (e) => {
-        e.preventDefault();
-        const userMessage = inputRef.current.value.trim();
-        if(!userMessage) return;
-        inputRef.current.value = "";
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const question = input.trim();
+    if (!question) return;
+    setChatHistory(h => [...h, { from: 'user', text: question }]);
+    setInput('');
 
-        // Update chat history with user message
-        setChatHistory((history) => [...history, {role: "user", text: userMessage }]);
+    // fetch from your FastAPI
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: question }),
+    });
+    const { answer } = await res.json();
+    setChatHistory(h => [...h, { from: 'bot', text: answer }]);
+  }
 
-        // "Thinking..." message for the bot
-        setTimeout(() => setChatHistory((history) => [...history, {role: "model", text: "I'm thinking 🙇🏻‍♂️ ..."}]), 600);
-    };
-
-    return (
-        <form action="#" className="chat-form" onSubmit={handleFormSubmit}>
-            <input ref={inputRef} type="text" placeholder="Message..." className="message-input" required/>
-            <button className="material-symbols-rounded">arrow_upward</button>
-        </form>
-    );
-};
-
-export default ChatForm;
+  return (
+    <form onSubmit={handleSubmit} className="chat-form">
+      <input
+        value={input}
+        onChange={e => setInput(e.target.value)}
+        placeholder="Ask me about compliance…"
+      />
+      <button type="submit">Send</button>
+    </form>
+  );
+}
