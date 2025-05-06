@@ -1,33 +1,70 @@
-import { useState } from 'react';
+// src/components/ChatForm.jsx
+import { useRef } from "react";
 
-export default function ChatForm({ setChatHistory }) {
-  const [input, setInput] = useState('');
+const ChatForm = ({ setChatHistory }) => {
+  const inputRef = useRef();
 
-  async function handleSubmit(e) {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    const question = input.trim();
-    if (!question) return;
-    setChatHistory(h => [...h, { from: 'user', text: question }]);
-    setInput('');
+    const userMessage = inputRef.current.value.trim();
+    if (!userMessage) return;
+    inputRef.current.value = "";
 
-    // fetch from your FastAPI
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: question }),
-    });
-    const { answer } = await res.json();
-    setChatHistory(h => [...h, { from: 'bot', text: answer }]);
-  }
+    // 1) Add user message
+    setChatHistory(history => [
+      ...history,
+      { role: "user", text: userMessage }
+    ]);
+
+    // 2) Add thinking placeholder
+    setChatHistory(history => [
+      ...history,
+      { role: "model", text: "I'm thinking 🙇🏻‍♂️ ..." }
+    ]);
+
+    try {
+      // 3) Call your FastAPI endpoint
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: userMessage }),
+      });
+      const { answer, sources } = await res.json();
+
+setChatHistory(hist => {
+  // drop the “thinking” placeholder
+  const withoutPlaceholder = hist.slice(0, -1);
+  return [
+    ...withoutPlaceholder,
+    { role: "model", text: answer, sources }
+  ];
+});
+    } catch (err) {
+      // on error, replace placeholder with an error message
+      setChatHistory(history => {
+        const withoutPlaceholder = history.slice(0, -1);
+        return [
+          ...withoutPlaceholder,
+          { role: "model", text: "Sorry, something went wrong." }
+        ];
+      });
+    }
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="chat-form">
+    <form className="chat-form" onSubmit={handleFormSubmit}>
       <input
-        value={input}
-        onChange={e => setInput(e.target.value)}
-        placeholder="Ask me about compliance…"
+        ref={inputRef}
+        type="text"
+        placeholder="Message..."
+        className="message-input"
+        autoComplete="off"
       />
-      <button type="submit">Send</button>
+      <button type="submit" className="material-symbols-rounded">
+        arrow_upward
+      </button>
     </form>
   );
-}
+};
+
+export default ChatForm;

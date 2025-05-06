@@ -15,7 +15,7 @@ const App = () => {
             <ChatbotIcon className="chat-logo"/>
             <h2 className="logo-text">ReguAI</h2>
           </div>
-          <button class="material-symbols-rounded">keyboard_arrow_down</button>
+          <button className="material-symbols-rounded">keyboard_arrow_down</button>
         </div>
         {/* Chatbot Body */}
         <div className="chat-body">
