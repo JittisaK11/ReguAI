@@ -49,6 +49,20 @@ npm install
 npm run dev
 ```
 
+### 4. Run Backend
+
+At the root of the directory, when you ls it should look like:
+
+```bash
+BE_test.ipynb           backend                 preprocessed_chunks.csv
+README.md               chroma_db               requirements.txt
+ReguAI-App              embeddings_rag.ipynb    sample.txt
+```
+RUN:
+```bash
+python -m uvicorn backend.app:app --reload
+```
+
 This will start the app at `http://localhost:5173` (or a different port if 5173 is in use).
 
 ## 🛠 Tech Stack
