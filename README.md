@@ -58,6 +58,8 @@ BE_test.ipynb           backend                 preprocessed_chunks.csv
 README.md               chroma_db               requirements.txt
 ReguAI-App              embeddings_rag.ipynb    sample.txt
 ```
+Make sure to change the OpenAI API key to your key in the backend/app.py file.
+
 RUN:
 ```bash
 python -m uvicorn backend.app:app --reload
