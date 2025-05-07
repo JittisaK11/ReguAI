@@ -32,7 +32,7 @@ ReguAI-App/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/ReguAI.git
+git clone https://github.com/JittisaK11/ReguAI.git
 cd ReguAI
 cd ReguAI-App
 ```
